@@ -7,6 +7,24 @@ const toGrid = ({x, y}: {x: number, y: number}) => ({
   y: Math.ceil(y / GRID_SIZE) - 1,
 });
 
+const getRoadDestination = (road: Building) => {
+  switch (road.type) {
+    case 'road_n':
+      return {x: road.x, y: road.y - 1}
+    case 'road_s':
+      return {x: road.x, y: road.y + 1}
+    case 'road_e':
+      return {x: road.x + 1, y: road.y}
+    case 'road_w':
+      return {x: road.x - 1, y: road.y}
+    default:
+      console.error(`Unknown road type ${road.type}`);
+      return null;
+  }
+}
+
+const choose_random = (array: []) => array[Math.floor(Math.random() * array.length)];
+
 export default class App extends React.Component<{}, { ghostBuilding: Building | null, buildings: Building[], units: Unit[]}> {
   currentbuildMode: string | null = null;
 
@@ -38,7 +56,11 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
 
         // Spawn
         if (house.cooldown <= 0 && !this.state.units.find(unit => unit.x === house.x && unit.y === house.y)) {
-          this.setState({units: [...this.state.units, new Unit(house.x, house.y, 'pawn')]});
+          const spawn_squares = this.getUnitSpawnSquares(house.x, house.y);
+          if (spawn_squares.length === 0) { return; }
+          // const destination = choose_random(spawn_squares);
+          const destination = spawn_squares[0];
+          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn')]});
           house.cooldown += 5;
         }
       });
@@ -46,15 +68,33 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
     this.state.units
       .filter(building => building.type === 'pawn')
       .forEach(pawn => {
-          const destination = {x: pawn.x + 1, y: pawn.y};
-          const destinationRoad = this.state.buildings.find(building => building.type === 'road' && building.x === destination.x && building.y === destination.y);
-          const occupyingUnit = destinationRoad && this.state.units.find(unit => unit.x === destinationRoad.x && unit.y === destinationRoad.y)
-          if (destinationRoad && !occupyingUnit) {
-            pawn.x = destination.x;
-            pawn.y = destination.y;
-            this.setState({units: [...this.state.units]});
-          }
+        const currentRoad = this.state.buildings.find(building => building.type.startsWith('road') && building.x === pawn.x && building.y === pawn.y);
+        if (! currentRoad) { return; }
+        const destination = getRoadDestination(currentRoad);
+        const occupyingUnit = destination && this.state.units.find(unit => unit.x === destination.x && unit.y === destination.y)
+        if (destination && !occupyingUnit) {
+          pawn.x = destination.x;
+          pawn.y = destination.y;
+          this.setState({units: [...this.state.units]});
+        }
       });
+  }
+
+  getUnitSpawnSquares(x: number, y: number): {x: number, y: number}[] {
+    const n = {x, y: y - 1};
+    const s = {x, y: y - 1};
+    const e = {x: x + 1, y};
+    const w = {x: x - 1, y};
+    const spawn_n = this.state.buildings.find(building => building.type === 'road_n' && building.x === n.x && building.y === n.y);
+    const spawn_s = this.state.buildings.find(building => building.type === 'road_s' && building.x === s.x && building.y === s.y);
+    const spawn_e = this.state.buildings.find(building => building.type === 'road_e' && building.x === e.x && building.y === e.y);
+    const spawn_w = this.state.buildings.find(building => building.type === 'road_w' && building.x === w.x && building.y === w.y);
+    return [
+      spawn_n,
+      spawn_s,
+      spawn_e,
+      spawn_w,
+    ].filter(spawn => spawn !== undefined && !this.state.units.find(unit => unit.x === spawn.x && unit.y === spawn.y)) as {x: number, y: number}[];
   }
 
   componentDidMount() {
@@ -93,7 +133,9 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
           {this.state.ghostBuilding && (<div className="ghost building" style={{ left: this.state.ghostBuilding.x * GRID_SIZE, top: this.state.ghostBuilding.y * GRID_SIZE }}>{React.createElement(this.state.ghostBuilding.svg)}</div>)}
         </div>
         <div className="units">
-          {this.state.units.map(unit => (<div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>{React.createElement(unit.svg)}</div>))}
+          {this.state.units.map(unit => (
+            <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>{React.createElement(unit.svg)}</div>
+          ))}
         </div>
         <div className="build-ui">
           <strong>Build:</strong>

@@ -1,5 +1,8 @@
 import { ReactComponent as House } from './svg/house.svg';
-import { ReactComponent as RoadEnd } from './svg/road_end.svg';
+import { ReactComponent as RoadNorth } from './svg/road_n.svg';
+import { ReactComponent as RoadEast } from './svg/road_e.svg';
+import { ReactComponent as RoadSouth } from './svg/road_s.svg';
+import { ReactComponent as RoadWest } from './svg/road_w.svg';
 import { ReactComponent as Pawn } from './svg/pawn.svg';
 
 export const GRID_SIZE = 64;
@@ -18,9 +21,24 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     svg: House,
   },
   {
-    id: 'road',
-    name: 'Road',
-    svg: RoadEnd,
+    id: 'road_n',
+    name: 'Road North',
+    svg: RoadNorth,
+  },
+  {
+    id: 'road_e',
+    name: 'Road East',
+    svg: RoadEast,
+  },
+  {
+    id: 'road_s',
+    name: 'Road South',
+    svg: RoadSouth,
+  },
+  {
+    id: 'road_w',
+    name: 'Road West',
+    svg: RoadWest,
   },
 ];
 
