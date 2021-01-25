@@ -1,3 +1,6 @@
+$z-index-buildings: 1;
+$z-index-ui: 2;
+
 .build-ui {
   font-size: 24px;
   width: 100vw;
@@ -8,6 +11,7 @@
   justify-content: center;
   align-content: space-around;
   align-items: center;
+  z-index: $z-index-ui;
 
   button {
     border: 0;
@@ -41,8 +45,10 @@
   position: absolute;
   height: 64px;
   width: 64px;
+  z-index: $z-index-buildings;
 }
 
 .ghost {
   opacity: .5;
+  z-index: $z-index-buildings;
 }
