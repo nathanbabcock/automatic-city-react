@@ -1,18 +1,40 @@
 import React from 'react';
 import { ReactComponent as House } from './svg/house.svg';
+import { ReactComponent as RoadEnd } from './svg/road_end.svg';
 import './App.scss';
 
 const GRID_SIZE = 64;
+
+type BuildingConfig = {
+  id: string,
+  name: string,
+  svg: React.FunctionComponent,
+}
+
+const BUILDINGS_CONFIG: BuildingConfig[] = [
+  {
+    id: 'house',
+    name: 'House',
+    svg: House,
+  },
+  {
+    id: 'road',
+    name: 'Road',
+    svg: RoadEnd,
+  },
+];
 
 class Building {
   x: number;
   y: number;
   type: string;
+  svg: React.FunctionComponent;
 
   constructor(x: number, y: number, type: string){
     this.x = x;
     this.y = y;
     this.type = type;
+    this.svg = BUILDINGS_CONFIG.find(config => config.id === type)!.svg;
   }
 }
 
@@ -20,6 +42,17 @@ const toGrid = ({x, y}: {x: number, y: number}) => ({
   x: Math.ceil(x / GRID_SIZE) - 1,
   y: Math.ceil(y / GRID_SIZE) - 1,
 });
+
+// const renderBuilding = (building: Building, additionalProps = []) => {
+//   const config = BUILDINGS_CONFIG.find(config => config.id === building.type);
+//   if (!config) {
+//     console.error(`Could not find config for building type ${building.type}`);
+//     return;
+//   }
+//   const TagName = config.svg;
+
+//   return (<div className="building" style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}><TagName/></div>);
+// }
 
 export default class App extends React.Component<{}, { ghostBuilding: Building | null, buildings: Building[]}> {
   currentbuildMode: string | null = null;
@@ -39,8 +72,6 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
     if (!this.state.ghostBuilding) { return; }
     const gridCoords = toGrid({ x: event.clientX, y: event.clientY });
     this.setState({ ghostBuilding: { ...this.state.ghostBuilding, ...gridCoords} });
-    console.log(event);
-    console.log(gridCoords);
   }
 
   componentDidMount() {
@@ -57,7 +88,7 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
     // Toggle build mode back off
     if (this.currentbuildMode !== null) {
       this.currentbuildMode = null;
-      this.setState({ghostBuilding: null})
+      this.setState({ghostBuilding: null});
       event.stopPropagation();
       return;
     }
@@ -74,12 +105,12 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
     return (
       <div>
         <div className="buildings">
-          {this.state.buildings.map(elem => (<House className="building" style={{ left: elem.x * GRID_SIZE, top: elem.y * GRID_SIZE }}/>))}
-          {this.state.ghostBuilding && (<House className="ghost building" style={{ left: this.state.ghostBuilding.x * GRID_SIZE, top: this.state.ghostBuilding.y * GRID_SIZE }}/>)}
+          {this.state.buildings.map(building => (<div className="building" style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>{React.createElement(building.svg)}</div>))}
+          {this.state.ghostBuilding && (<div className="ghost building" style={{ left: this.state.ghostBuilding.x * GRID_SIZE, top: this.state.ghostBuilding.y * GRID_SIZE }}>{React.createElement(this.state.ghostBuilding.svg)}</div>)}
         </div>
         <div className="build-ui">
-          <strong>Build</strong>
-          <button onClick={(event) => this.setBuildMode('house', event)}><House/></button>
+          <strong>Build:</strong>
+          { BUILDINGS_CONFIG.map(building => (<button onClick={(event) => this.setBuildMode(building.id, event)}>{React.createElement(building.svg)}</button>))}
         </div>
       </div>
     );

@@ -43,9 +43,12 @@ $z-index-ui: 2;
 
 .building {
   position: absolute;
-  height: 64px;
-  width: 64px;
   z-index: $z-index-buildings;
+
+  svg {
+    height: 64px;
+    width: 64px;
+  }
 }
 
 .ghost {
