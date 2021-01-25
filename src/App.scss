@@ -27,7 +27,7 @@
     }
 
     &:focus {
-      outline: none; // bad accesibility
+      outline: none; // bad accessibility
     }
   }
 
@@ -35,4 +35,14 @@
     height: 64px;
     width: 64px;
   }
+}
+
+.building {
+  position: absolute;
+  height: 64px;
+  width: 64px;
+}
+
+.ghost {
+  opacity: .5;
 }
