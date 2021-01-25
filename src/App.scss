@@ -1,5 +1,6 @@
 $z-index-buildings: 1;
-$z-index-ui: 2;
+$z-index-units: 2;
+$z-index-ui: 3;
 
 .build-ui {
   font-size: 24px;
@@ -41,9 +42,9 @@ $z-index-ui: 2;
   }
 }
 
-.building {
+.building,
+.unit {
   position: absolute;
-  z-index: $z-index-buildings;
 
   svg {
     height: 64px;
@@ -51,7 +52,21 @@ $z-index-ui: 2;
   }
 }
 
+.building {
+  z-index: $z-index-buildings;
+}
+
+.unit {
+  z-index: $z-index-units;
+}
+
 .ghost {
   opacity: .5;
   z-index: $z-index-buildings;
+}
+
+.unit {
+  transition-property: left, top;
+  transition-timing-function: linear;
+  transition-duration: 1s;
 }
