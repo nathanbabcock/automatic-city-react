@@ -80,9 +80,20 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
         // Hunger
         pawn.food--;
         if (pawn.food === 0) {
+          // Drop held item
+          if (pawn.held_item) {
+            pawn.held_item.x = pawn.x;
+            pawn.held_item.y = pawn.y;
+            this.setState({
+              items: [...this.state.items, pawn.held_item]
+            });
+          }
+
+          // Starve
           this.setState({
             units: [...this.state.units.filter(unit => unit !== pawn)],
           });
+
           return;
         }
 
@@ -109,12 +120,19 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
                 items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],
               });
             }
-            this.setState({
-              buildings: [...this.state.buildings],
-            });
             interacted = true;
           }
         });
+
+        // Pick up item
+        const itemToPickup = this.state.items.find(item => item.x === pawn.x && item.y === pawn.y);
+        if(!pawn.held_item && itemToPickup) {
+          pawn.held_item = itemToPickup;
+          this.setState({
+            items: this.state.items.filter(item => item !== itemToPickup)
+          });
+        }
+
         if (interacted) { return; }
 
         // Move
@@ -237,6 +255,7 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
           {this.state.units.map(unit => (
             <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
               {React.createElement(unit.svg)}
+              {unit.held_item && (<div className="held-item">{React.createElement(unit.held_item.svg)}</div>)}
               <div className="food-bar">
                 <div className="food-bar-fill" style={{height: `${Math.round((unit.food / MAX_FOOD) * 100)}%`}}></div>
               </div>

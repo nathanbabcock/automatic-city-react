@@ -109,6 +109,23 @@ $z-index-ui: 3;
   }
 }
 
+.held-item {
+  position: absolute;
+
+  // Held above head:
+  right: 16px;
+  top: -32px;
+
+  // Held in "hand":
+  // right: 0px;
+  // top: 16px;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 .unit:hover {
   .food-bar {
     display: flex;

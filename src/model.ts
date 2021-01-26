@@ -132,12 +132,14 @@ export class Unit {
   type: string;
   food: number;
   svg: React.FunctionComponent;
+  held_item: Item | null;
 
   constructor(x: number, y: number, type: string){
     this.x = x;
     this.y = y;
     this.type = type;
     this.food = 20;
+    this.held_item = null;
     this.svg = UNITS_CONFIG.find(config => config.id === type)!.svg;
   }
 }
