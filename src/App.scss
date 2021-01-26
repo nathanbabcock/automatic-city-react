@@ -43,17 +43,32 @@ $z-index-ui: 3;
 }
 
 .building,
-.unit {
+.unit,
+.item {
   position: absolute;
+}
 
+.building,
+.unit {
   svg {
     height: 64px;
     width: 64px;
   }
 }
 
+.item {
+  svg {
+    height: 32px;
+    width: 32px;
+  }
+}
+
 .building {
   z-index: $z-index-buildings;
+}
+
+.cooldown {
+  opacity: .5;
 }
 
 .unit {
