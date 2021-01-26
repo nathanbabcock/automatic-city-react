@@ -85,3 +85,32 @@ $z-index-ui: 3;
   transition-timing-function: linear;
   transition-duration: 1s;
 }
+
+.item {
+  padding: 16px;
+}
+
+.food-bar {
+  $food-bar-width: 4px;
+  $food-bar-height: 36px;
+  position: absolute;
+  height: $food-bar-height;
+  width: $food-bar-width;
+  right: -$food-bar-width;
+  top: (64px - $food-bar-height) / 2;
+  border: 1px solid black;
+  flex-direction: column;
+  justify-content: flex-end;
+  display: none;
+
+  &-fill {
+    width: 100%;
+    background-color: black;
+  }
+}
+
+.unit:hover {
+  .food-bar {
+    display: flex;
+  }
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD } from './model';
 import './App.scss';
 
 const randInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1) + min);
@@ -70,27 +70,47 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
           if (spawn_squares.length === 0) { return; }
           const destination = spawn_squares[0];
           this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn')]});
-          house.cooldown = 999999;
+          house.cooldown = MAX_FOOD;
         }
       });
 
     this.state.units
       .filter(unit => unit.type === 'pawn')
       .forEach(pawn => {
+        // Hunger
+        pawn.food--;
+        if (pawn.food === 0) {
+          this.setState({
+            units: [...this.state.units.filter(unit => unit !== pawn)],
+          });
+          return;
+        }
+
         // Gather
         let interacted = false;
         const adjacent = getAdjacent(pawn.x, pawn.y);
-        const resources = ['tree', 'rock']
+        const resources = ['tree', 'rock', 'bush']
         adjacent.forEach(tile => {
           if (interacted) { return; }
           const resource = this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && resources.includes(building.type));
           if (!resource) { return; }
           if (resource.cooldown <= 0) {
-            const itemSpawn = {x: pawn.x, y: pawn.y};
-            const itemType = resource.type === 'tree' ? 'logs' : 'ore';
-            resource.cooldown = 10;
+            if (resource.type === 'bush') {
+              pawn.food = MAX_FOOD;
+              resource.cooldown = 10;
+              this.setState({
+                units: [...this.state.units],
+              });
+            } else {
+              const itemSpawn = {x: pawn.x, y: pawn.y};
+              const itemType = resource.type === 'tree' ? 'logs' : 'ore';
+              resource.cooldown = 10;
+              this.setState({
+                items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],
+              });
+            }
             this.setState({
-              items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],
+              buildings: [...this.state.buildings],
             });
             interacted = true;
           }
@@ -143,9 +163,11 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
   }
 
   restart() {
+    this.state.buildings.forEach(building => building.cooldown = 0);
     return this.setState({
       items: [],
       units: [],
+      buildings: [...this.state.buildings],
     });
   }
 
@@ -213,7 +235,12 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
         </div>
         <div className="units">
           {this.state.units.map(unit => (
-            <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>{React.createElement(unit.svg)}</div>
+            <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
+              {React.createElement(unit.svg)}
+              <div className="food-bar">
+                <div className="food-bar-fill" style={{height: `${Math.round((unit.food / MAX_FOOD) * 100)}%`}}></div>
+              </div>
+            </div>
           ))}
         </div>
         <div className="build-ui">

@@ -25,10 +25,13 @@ import { ReactComponent as Crops } from './svg/crops.svg';
 import { ReactComponent as Sprout } from './svg/sprout.svg';
 import { ReactComponent as Seeds } from './svg/seeds.svg';
 import { ReactComponent as Fish } from './svg/fish.svg';
+import { ReactComponent as Stump } from './svg/stump.svg';
+import { ReactComponent as Bush } from './svg/bush.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
 export const TICK_RATE = 1; // per second
+export const MAX_FOOD = 20;
 
 /* Buildings */
 export type BuildingConfig = {
@@ -77,6 +80,22 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     id: 'wall',
     svg: Wall,
   },
+  {
+    id: 'crops',
+    svg: Crops,
+  },
+  {
+    id: 'sprout',
+    svg: Sprout,
+  },
+  {
+    id: 'stump',
+    svg: Stump,
+  },
+  {
+    id: 'bush',
+    svg: Bush,
+  },
 ];
 
 export class Building {
@@ -111,12 +130,14 @@ export class Unit {
   x: number;
   y: number;
   type: string;
+  food: number;
   svg: React.FunctionComponent;
 
   constructor(x: number, y: number, type: string){
     this.x = x;
     this.y = y;
     this.type = type;
+    this.food = 20;
     this.svg = UNITS_CONFIG.find(config => config.id === type)!.svg;
   }
 }
@@ -175,14 +196,6 @@ export const ITEMS_CONFIG: ItemConfig[] = [
   {
     id: 'wheat',
     svg: Wheat,
-  },
-  {
-    id: 'crops',
-    svg: Crops,
-  },
-  {
-    id: 'sprout',
-    svg: Sprout,
   },
   {
     id: 'seeds',
