@@ -1,14 +1,5 @@
-$z-index-roads: 1;
-$z-index-buildings: 2;
-$z-index-units: 3;
-$z-index-ui: 4;
-
-$house-primary: #000A65;
-$stonework-primary: #B03E0E;
-$mine-primary: #1A91FF;
-$furnace-primary: #FF881A;
-$anvil-primary: #260037;
-$chest-primary: #441D00;
+@import './styles/variables';
+@import './styles/colors';
 
 .build-ui {
   font-size: 24px;
@@ -58,6 +49,15 @@ $chest-primary: #441D00;
 
 .building,
 .unit {
+  button {
+    border: none;
+    background: none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
   svg {
     height: 64px;
     width: 64px;

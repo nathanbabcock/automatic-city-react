@@ -3,6 +3,7 @@ import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD,
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
+import { CraftingModal } from './components/crafting-modal/crafting-modal';
 
 const randInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -36,7 +37,22 @@ const getAdjacent = (x: number, y: number): {x: number, y: number}[] => {
   ];
 };
 
-export default class App extends React.Component<{}, { ghostBuilding: Building | null, buildings: Building[], units: Unit[], items: Item[]}> {
+const isCraftingStation = (building: Building): boolean => {
+  const config = BUILDINGS_CONFIG.find(config => config.id === building.type);
+  if (!config) return false;
+  return !!config.craftingRecipes;
+}
+
+interface AppState {
+  buildings: Building[],
+  units: Unit[],
+  items: Item[]
+
+  ghostBuilding: Building | null,
+  craftingModal: Building | null,
+}
+
+export default class App extends React.Component<{}, AppState> {
   currentbuildMode: string | null = null;
 
   onClick(event: MouseEvent) {
@@ -307,8 +323,11 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
         <div className="buildings">
           {this.state.buildings.map(building => (
             <div className={`building ${building.type} ${(building.cooldown ? 'cooldown' : '')}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
-              {React.createElement(building.svg)}
-              {['furnace', 'chest', 'anvil', 'stonework-table'].includes(building.type) && (
+              <button onClick={() => isCraftingStation(building) && this.setState({craftingModal: building})}>
+                {React.createElement(building.svg)}
+              </button>
+              
+              {isCraftingStation(building) && (
               <div>
                 <button onClick={() => this.toggleConnector(building, 'n')} className={'connector north ' + (building.connector_n || '')}>
                   <Connector className="connector-line"></Connector>
@@ -334,11 +353,13 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
           ))}
           {this.state.ghostBuilding && (<div className="ghost building" style={{ left: this.state.ghostBuilding.x * GRID_SIZE, top: this.state.ghostBuilding.y * GRID_SIZE }}>{React.createElement(this.state.ghostBuilding.svg)}</div>)}
         </div>
+
         <div className="items">
           {this.state.items.map(item => (
             <div className="item" style={{ left: item.x * GRID_SIZE, top: item.y * GRID_SIZE }}>{React.createElement(item.svg)}</div>
           ))}
         </div>
+
         <div className="units">
           {this.state.units.map(unit => (
             <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
@@ -350,12 +371,15 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
             </div>
           ))}
         </div>
+
         <div className="build-ui">
           <strong>Build:</strong>
           { BUILDINGS_CONFIG.map(building => (<button onClick={(event) => this.setBuildMode(building.id, event)}>{React.createElement(building.svg)}</button>))}
           <button onClick={this.restart.bind(this)}>Restart</button>
           <button onClick={this.clear.bind(this)}>Clear</button>
         </div>
+
+        { this.state.craftingModal && <CraftingModal building={this.state.craftingModal}/>}
       </div>
     );
   }
@@ -363,10 +387,12 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
   constructor(props: any) {
     super(props);
     this.state = {
-      ghostBuilding: null,
       buildings: [],
       units: [],
       items: [],
+
+      ghostBuilding: null,
+      craftingModal: null,
     }
   }
 }

@@ -34,6 +34,7 @@ import { ReactComponent as Anvil } from './svg/anvil.svg';
 import { ReactComponent as Chest } from './svg/chest.svg';
 import { ReactComponent as Mine } from './svg/mine.svg';
 import { ReactComponent as Furnace } from './svg/furnace.svg';
+import { ReactComponent as StoneworkIcon } from './svg/stonework-icon.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
@@ -51,7 +52,10 @@ export type CraftingRecipe = {
 export type BuildingConfig = {
   id: string,
   svg: React.FunctionComponent,
-  craftingRecipes?: CraftingRecipe[]
+  icon?: React.FunctionComponent,
+  craftingRecipes?: CraftingRecipe[],
+  inputSlots?: number,
+  outputSlots?: number,
 }
 
 export const BUILDINGS_CONFIG: BuildingConfig[] = [
@@ -61,6 +65,7 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   },
   {
     id: 'stonework-table',
+    icon: StoneworkIcon,
     svg: StoneworkTable,
     craftingRecipes: [
       {
@@ -75,7 +80,25 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
         input: 'stone',
         output: 'sword',
       },
-    ]
+    ],
+    inputSlots: 1,
+    outputSlots: 1,
+  },
+  {
+    id: 'anvil',
+    svg: Anvil,
+  },
+  // {
+  //   id: 'mine',
+  //   svg: Mine,
+  // },
+  {
+    id: 'furnace',
+    svg: Furnace,
+  },
+  {
+    id: 'chest',
+    svg: Chest,
   },
   {
     id: 'road_n',
@@ -129,22 +152,6 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     id: 'stone-pile',
     svg: StonePile,
   },
-  {
-    id: 'chest',
-    svg: Chest,
-  },
-  {
-    id: 'anvil',
-    svg: Anvil,
-  },
-  {
-    id: 'mine',
-    svg: Mine,
-  },
-  {
-    id: 'furnace',
-    svg: Furnace,
-  },
 ];
 
 export type ConnectorType = 'in' | 'out' | null;
@@ -161,6 +168,7 @@ export class Building {
   connector_w: ConnectorType = null;
   input: Item[] = [];
   output: Item[] = [];
+  selectedRecipe: CraftingRecipe | null = null;
 
   constructor(x: number, y: number, type: string){
     this.x = x;
@@ -273,6 +281,12 @@ export const ITEMS_CONFIG: ItemConfig[] = [
     svg: Stone,
   },
 ];
+
+export type ItemStack = {
+  type: string,
+  quantity: number,
+  config?: ItemConfig,
+}
 
 export class Item {
   x: number;
