@@ -1,6 +1,7 @@
-$z-index-buildings: 1;
-$z-index-units: 2;
-$z-index-ui: 3;
+$z-index-roads: 1;
+$z-index-buildings: 2;
+$z-index-units: 3;
+$z-index-ui: 4;
 
 $house-primary: #000A65;
 $stonework-primary: #B03E0E;
@@ -72,6 +73,10 @@ $chest-primary: #441D00;
 
 .building {
   z-index: $z-index-buildings;
+}
+
+.road_n, .road_s, .road_e, .road_w {
+  z-index: $z-index-roads;
 }
 
 .cooldown {

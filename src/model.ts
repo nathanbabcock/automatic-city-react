@@ -41,9 +41,17 @@ export const TICK_RATE = 1; // per second
 export const MAX_FOOD = 20;
 
 /* Buildings */
+export type CraftingRecipe = {
+  input: string,
+  output: string,
+  input_quantity?: number,
+  output_quantity?: number,
+}
+
 export type BuildingConfig = {
   id: string,
   svg: React.FunctionComponent,
+  craftingRecipes?: CraftingRecipe[]
 }
 
 export const BUILDINGS_CONFIG: BuildingConfig[] = [
@@ -54,6 +62,20 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   {
     id: 'stonework-table',
     svg: StoneworkTable,
+    craftingRecipes: [
+      {
+        input: 'stone',
+        output: 'axe',
+      },
+      {
+        input: 'stone',
+        output: 'pick',
+      },
+      {
+        input: 'stone',
+        output: 'sword',
+      },
+    ]
   },
   {
     id: 'road_n',
@@ -74,10 +96,6 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   {
     id: 'cave',
     svg: Cave,
-  },
-  {
-    id: 'orc',
-    svg: Orc,
   },
   {
     id: 'rock',
@@ -141,6 +159,8 @@ export class Building {
   connector_s: ConnectorType = null;
   connector_e: ConnectorType = null;
   connector_w: ConnectorType = null;
+  input: Item[] = [];
+  output: Item[] = [];
 
   constructor(x: number, y: number, type: string){
     this.x = x;
@@ -160,6 +180,10 @@ export const UNITS_CONFIG: UnitConfig[] = [
   {
     id: 'pawn',
     svg: Pawn,
+  },
+  {
+    id: 'orc',
+    svg: Orc,
   },
 ];
 

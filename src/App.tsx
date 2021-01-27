@@ -102,7 +102,7 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
         // Gather
         let interacted = false;
         const adjacent = getAdjacent(pawn.x, pawn.y);
-        const resources = ['tree', 'rock', 'bush', 'stone-pile']
+        const resources = ['tree', 'rock', 'bush', 'stone-pile'];
         adjacent.forEach(tile => {
           if (interacted) { return; }
           const resource = this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && resources.includes(building.type));
@@ -123,6 +123,31 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
                 items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],
               });
             }
+            interacted = true;
+          }
+        });
+
+        // Load/unload crafting
+        const crafting = ['stonework-table', 'furnace', 'anvil', 'chest'];
+        adjacent.forEach(tile => {
+          if (interacted) { return; }
+          const craftingStation = this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && crafting.includes(building.type));
+          if (!craftingStation) { return; }
+
+          let connector;
+          if (craftingStation.y > pawn.y) { connector = craftingStation.connector_n; }
+          if (craftingStation.y < pawn.y) { connector = craftingStation.connector_s; }
+          if (craftingStation.x > pawn.x) { connector = craftingStation.connector_w; }
+          if (craftingStation.x < pawn.x) { connector = craftingStation.connector_e; }
+
+          if (connector === 'in' && pawn.held_item) {
+            console.log(craftingStation);
+            console.log(craftingStation.input);
+            craftingStation.input.push(pawn.held_item);
+            pawn.held_item = null;
+            interacted = true;
+          } else if (connector === 'out' && craftingStation.output.length > 0 && !pawn.held_item) {
+            pawn.held_item = craftingStation.output.pop() as Item;
             interacted = true;
           }
         });
@@ -149,6 +174,24 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
           this.setState({units: [...this.state.units]});
         }
       });
+
+    // Craft
+    this.state.buildings
+    .forEach(craftingStation => {
+      const config = BUILDINGS_CONFIG.find(config => config.id === craftingStation.type);
+      if (!config) { return; }
+      if (!config.craftingRecipes) { return; }
+
+      let crafted = false;
+      config.craftingRecipes.forEach(recipe => {
+        if (crafted) { return; }
+        let inputItem = craftingStation.input.find(item => item.type === recipe.input);
+        if (!inputItem) { return; }
+        craftingStation.output.push(new Item(craftingStation.x, craftingStation.y, recipe.output));
+        craftingStation.input = craftingStation.input.filter(input => input !== inputItem);
+        crafted = true;
+      });
+    });
 
     // Dirty force refresh
     this.setState({
