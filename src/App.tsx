@@ -100,7 +100,7 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
         // Gather
         let interacted = false;
         const adjacent = getAdjacent(pawn.x, pawn.y);
-        const resources = ['tree', 'rock', 'bush']
+        const resources = ['tree', 'rock', 'bush', 'stone-pile']
         adjacent.forEach(tile => {
           if (interacted) { return; }
           const resource = this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && resources.includes(building.type));
@@ -113,8 +113,9 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
                 units: [...this.state.units],
               });
             } else {
+              if (pawn.held_item) { return; }
               const itemSpawn = {x: pawn.x, y: pawn.y};
-              const itemType = resource.type === 'tree' ? 'logs' : 'ore';
+              const itemType = resource.type === 'tree' ? 'logs' : (resource.type === 'stone-pile' ? 'stone' : 'ore');
               resource.cooldown = 10;
               this.setState({
                 items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],

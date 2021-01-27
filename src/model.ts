@@ -27,6 +27,9 @@ import { ReactComponent as Seeds } from './svg/seeds.svg';
 import { ReactComponent as Fish } from './svg/fish.svg';
 import { ReactComponent as Stump } from './svg/stump.svg';
 import { ReactComponent as Bush } from './svg/bush.svg';
+import { ReactComponent as StoneworkTable } from './svg/stonework-table.svg';
+import { ReactComponent as StonePile } from './svg/stone-pile.svg';
+import { ReactComponent as Stone } from './svg/stone.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
@@ -43,6 +46,10 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   {
     id: 'house',
     svg: House,
+  },
+  {
+    id: 'stonework-table',
+    svg: StoneworkTable,
   },
   {
     id: 'road_n',
@@ -95,6 +102,10 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   {
     id: 'bush',
     svg: Bush,
+  },
+  {
+    id: 'stone-pile',
+    svg: StonePile,
   },
 ];
 
@@ -206,6 +217,10 @@ export const ITEMS_CONFIG: ItemConfig[] = [
   {
     id: 'fish',
     svg: Fish,
+  },
+  {
+    id: 'stone',
+    svg: Stone,
   },
 ];
 
