@@ -30,6 +30,10 @@ import { ReactComponent as Bush } from './svg/bush.svg';
 import { ReactComponent as StoneworkTable } from './svg/stonework-table.svg';
 import { ReactComponent as StonePile } from './svg/stone-pile.svg';
 import { ReactComponent as Stone } from './svg/stone.svg';
+import { ReactComponent as Anvil } from './svg/anvil.svg';
+import { ReactComponent as Chest } from './svg/chest.svg';
+import { ReactComponent as Mine } from './svg/mine.svg';
+import { ReactComponent as Furnace } from './svg/furnace.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
@@ -107,7 +111,25 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     id: 'stone-pile',
     svg: StonePile,
   },
+  {
+    id: 'chest',
+    svg: Chest,
+  },
+  {
+    id: 'anvil',
+    svg: Anvil,
+  },
+  {
+    id: 'mine',
+    svg: Mine,
+  },
+  {
+    id: 'furnace',
+    svg: Furnace,
+  },
 ];
+
+export type ConnectorType = 'in' | 'out' | null;
 
 export class Building {
   x: number;
@@ -115,6 +137,10 @@ export class Building {
   type: string;
   svg: React.FunctionComponent;
   cooldown: number = 0;
+  connector_n: ConnectorType = null;
+  connector_s: ConnectorType = null;
+  connector_e: ConnectorType = null;
+  connector_w: ConnectorType = null;
 
   constructor(x: number, y: number, type: string){
     this.x = x;

@@ -2,6 +2,13 @@ $z-index-buildings: 1;
 $z-index-units: 2;
 $z-index-ui: 3;
 
+$house-primary: #000A65;
+$stonework-primary: #B03E0E;
+$mine-primary: #1A91FF;
+$furnace-primary: #FF881A;
+$anvil-primary: #260037;
+$chest-primary: #441D00;
+
 .build-ui {
   font-size: 24px;
   width: 100vw;
@@ -133,4 +140,73 @@ $z-index-ui: 3;
   .food-bar {
     display: flex;
   }
+}
+
+.connector {
+  $connector-line-height: 41px;
+
+  position: absolute;
+  top: -$connector-line-height;
+  display: flex;
+  flex-direction: row;
+  width: 64px;
+  justify-content: center;
+  align-items: flex-end;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+
+  .connector-line {
+    width: 18px;
+    height: $connector-line-height;
+  }
+
+  .connector-arrow {
+    width: 19px;
+    height: 19px;
+    margin-bottom: 5px;
+  }
+
+  &.in {
+    .connector-arrow {
+      transform: rotate(180deg);
+    }
+  }
+
+  &.east {
+    transform: rotate(90deg);
+    top: 10px;
+    right: -($connector-line-height + 11px);
+  }
+
+  &.west {
+    transform: rotate(-90deg);
+    top: 10px;
+    left: -($connector-line-height + 11px);
+    right: auto;
+  }
+
+  &.south {
+    transform: rotate(180deg);
+    bottom: -37px;
+    top: auto;
+  }
+
+  &.in, &.out {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &:hover:not(.in):not(.out) {
+    opacity: .2;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.stonework-table .connector path {
+  fill: $stonework-primary;
 }

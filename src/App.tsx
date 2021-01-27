@@ -1,5 +1,7 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType } from './model';
+import { ReactComponent as Connector } from './svg/connector.svg';
+import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
 
 const randInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1) + min);
@@ -236,13 +238,55 @@ export default class App extends React.Component<{}, { ghostBuilding: Building |
     event.stopPropagation();
   }
 
+  toggleConnector(building: Building, side: 'n' | 's' | 'e' | 'w') {
+    const cycleConnectorType = (initialType: ConnectorType): ConnectorType => {
+      if (initialType === 'out') { return 'in'; }
+      if (initialType === 'in') { return null; }
+      return initialType = 'out';
+    } 
+
+    switch(side) {
+      case 'n': building.connector_n = cycleConnectorType(building.connector_n); break;
+      case 's': building.connector_s = cycleConnectorType(building.connector_s); break;
+      case 'e': building.connector_e = cycleConnectorType(building.connector_e); break;
+      case 'w': building.connector_w = cycleConnectorType(building.connector_w); break;
+      default: return console.error('Unknown connector side ' + side);
+    }
+
+    this.setState({
+      buildings: [...this.state.buildings]
+    });
+  }
+
   render() {
     return (
       <div>
         <div className="buildings">
           {this.state.buildings.map(building => (
-            <div className={`building ${building.cooldown && 'cooldown'}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
+            <div className={`building ${building.type} ${(building.cooldown ? 'cooldown' : '')}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
               {React.createElement(building.svg)}
+              {['furnace', 'chest', 'anvil', 'stonework-table'].includes(building.type) && (
+              <div>
+                <button onClick={() => this.toggleConnector(building, 'n')} className={'connector north ' + (building.connector_n || '')}>
+                  <Connector className="connector-line"></Connector>
+                  <ConnectorArrow className="connector-arrow"></ConnectorArrow>
+                </button>
+
+                <button onClick={() => this.toggleConnector(building, 'e')}  className={'connector east ' + (building.connector_e || '')}>
+                  <Connector className="connector-line"></Connector>
+                  <ConnectorArrow className="connector-arrow"></ConnectorArrow>
+                </button>
+
+                <button onClick={() => this.toggleConnector(building, 'w')}  className={'connector west ' + (building.connector_w || '')}>
+                  <Connector className="connector-line"></Connector>
+                  <ConnectorArrow className="connector-arrow"></ConnectorArrow>
+                </button>
+
+                <button onClick={() => this.toggleConnector(building, 's')}  className={'connector south ' + (building.connector_s || '')}>
+                  <Connector className="connector-line"></Connector>
+                  <ConnectorArrow className="connector-arrow"></ConnectorArrow>
+                </button>
+              </div>)}
             </div>
           ))}
           {this.state.ghostBuilding && (<div className="ghost building" style={{ left: this.state.ghostBuilding.x * GRID_SIZE, top: this.state.ghostBuilding.y * GRID_SIZE }}>{React.createElement(this.state.ghostBuilding.svg)}</div>)}
