@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe } from './model';
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
@@ -100,7 +100,7 @@ export default class App extends React.Component<{}, AppState> {
         if (!config.craftingRecipes) { return; }
 
         let crafted = false;
-        config.craftingRecipes.forEach(recipe => {
+        [craftingStation.selectedRecipe!].forEach(recipe => {
           if (crafted) { return; }
           let inputStack: ItemStack | undefined = craftingStation.input.find(item => item.type === recipe.input);
           if (!inputStack || inputStack.quantity === 0) { return; }
@@ -391,11 +391,14 @@ export default class App extends React.Component<{}, AppState> {
           <button onClick={this.clear.bind(this)}>Clear</button>
         </div>
 
-        { this.state.craftingModal &&
-          <CraftingModal
-              building={this.state.craftingModal}
-              config={BUILDINGS_CONFIG.find(config => config.id === this.state.craftingModal!.type)!}
-              onClose={() => this.setState({craftingModal: null})}
+        { this.state.craftingModal && <CraftingModal
+            building={this.state.craftingModal}
+            config={BUILDINGS_CONFIG.find(config => config.id === this.state.craftingModal!.type)!}
+            onClose={() => this.setState({craftingModal: null})}
+            onSelectRecipe={(recipe: CraftingRecipe) => { 
+              this.state.craftingModal!.selectedRecipe = recipe;
+              this.setState({buildings: [...this.state.buildings]});
+            }}
         />}
       </div>
     );

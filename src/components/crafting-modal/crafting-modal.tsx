@@ -1,11 +1,12 @@
 import React from 'react';
-import { Building, BuildingConfig, getItemConfig, GRID_SIZE, Item, ItemStack, ITEMS_CONFIG } from '../../model';
+import { Building, BuildingConfig, CraftingRecipe, getItemConfig, GRID_SIZE, Item, ItemStack, ITEMS_CONFIG } from '../../model';
 import './crafting-modal.scss';
 
 interface CraftingModalProps {
   building: Building,
   config: BuildingConfig,
   onClose?: Function,
+  onSelectRecipe?: (recipe: CraftingRecipe) => any,
 }
 
 interface CraftingModalState {
@@ -47,18 +48,28 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
         {React.createElement(this.props.config.icon!)}
       </div>
 
-      <div className="crafting-output">
-      {Array.from(Array(this.props.config.outputSlots)).map((_, index) => {
+      <div className={`crafting-output ${this.state.outputSelectorOpen && 'selector-open'}`}>
+      {!this.state.outputSelectorOpen && Array.from(Array(this.props.config.outputSlots)).map((_, index) => {
           const isEmpty = this.props.building.output.length <= index || this.props.building.output[index].quantity === 0;
-          return <div className={`output-slot ${isEmpty && 'empty'}`}>
+          return <button className={`output-slot ${isEmpty && 'empty'}`} onClick={() => this.setState({outputSelectorOpen: true})}>
             {this.props.building.selectedRecipe && React.createElement(getItemConfig(this.props.building.selectedRecipe.output).svg)}
             <span className="item-quantity">
               {isEmpty ? 0 : this.props.building.output[index].quantity}
             </span>
-          </div>
+          </button>
+        })}
+        { this.state.outputSelectorOpen && this.props.building.config.craftingRecipes?.map(recipe => {
+          return <button className="output-slot selector-option" onClick={() => this.selectRecipe(recipe)}>
+            {React.createElement(getItemConfig(recipe.output).svg)}
+          </button>
         })}
       </div>
     </div>;
+  }
+
+  selectRecipe(recipe: CraftingRecipe): void {
+    this.props.onSelectRecipe && this.props.onSelectRecipe(recipe);
+    this.setState({outputSelectorOpen: false});
   }
 
   constructor(props: any) {
