@@ -5,6 +5,7 @@ import './crafting-modal.scss';
 interface CraftingModalProps {
   building: Building,
   config: BuildingConfig,
+  onClose?: Function,
 }
 
 interface CraftingModalState {
@@ -25,16 +26,21 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
   }
 
   render(): JSX.Element {
-    return <div className={`crafting-modal ${this.props.building.type}`} style={{left: this.props.building.x * GRID_SIZE, top: this.props.building.y * GRID_SIZE}}>
+    return <div
+        className={`crafting-modal ${this.props.building.type}`}
+        style={{left: this.props.building.x * GRID_SIZE, top: this.props.building.y * GRID_SIZE}}
+        onMouseLeave={() => this.props.onClose && this.props.onClose()}
+    >
       <div className="crafting-input">
-        {Array.from(Array(this.props.config.inputSlots)).map((_, index) => (
-          <div className="input-slot">
-            {this.props.building.input.length > index && React.createElement(getItemConfig(this.props.building.input[index].type).svg)}
-            {this.props.building.input.length > index && <span className="item-quantity">
-              {this.props.building.input[index].quantity}
-            </span>}
+        {Array.from(Array(this.props.config.inputSlots)).map((_, index) => {
+          const isEmpty = this.props.building.input.length <= index || this.props.building.input[index].quantity === 0;
+          return <div className={`input-slot ${isEmpty && 'empty'}`}>
+            {this.props.building.selectedRecipe && React.createElement(getItemConfig(this.props.building.selectedRecipe.input).svg)}
+            <span className="item-quantity">
+              {isEmpty ? 0 : this.props.building.input[index].quantity}
+            </span>
           </div>          
-        ))}
+      })}
       </div>
       
       <div className="crafting-icon">
@@ -42,14 +48,15 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
       </div>
 
       <div className="crafting-output">
-      {Array.from(Array(this.props.config.outputSlots)).map((_, index) => (
-          <div className="output-slot">
-            {this.props.building.output.length > index && React.createElement(getItemConfig(this.props.building.output[index].type).svg)}
-            {this.props.building.output.length > index && <span className="item-quantity">
-              {this.props.building.output[index].quantity}
-            </span>}
+      {Array.from(Array(this.props.config.outputSlots)).map((_, index) => {
+          const isEmpty = this.props.building.output.length <= index || this.props.building.output[index].quantity === 0;
+          return <div className={`output-slot ${isEmpty && 'empty'}`}>
+            {this.props.building.selectedRecipe && React.createElement(getItemConfig(this.props.building.selectedRecipe.output).svg)}
+            <span className="item-quantity">
+              {isEmpty ? 0 : this.props.building.output[index].quantity}
+            </span>
           </div>
-        ))}
+        })}
       </div>
     </div>;
   }

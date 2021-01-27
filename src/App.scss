@@ -14,10 +14,7 @@
   z-index: $z-index-ui;
 
   button {
-    border: 0;
-    background: none;
     margin: 16px;
-    padding: 0;
     height: 64px;
     width: 64px;
     cursor: pointer;
@@ -49,15 +46,6 @@
 
 .building,
 .unit {
-  button {
-    border: none;
-    background: none;
-
-    &:focus {
-      outline: none;
-    }
-  }
-
   svg {
     height: 64px;
     width: 64px;

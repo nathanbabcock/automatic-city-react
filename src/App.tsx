@@ -103,7 +103,7 @@ export default class App extends React.Component<{}, AppState> {
         config.craftingRecipes.forEach(recipe => {
           if (crafted) { return; }
           let inputStack: ItemStack | undefined = craftingStation.input.find(item => item.type === recipe.input);
-          if (!inputStack) { return; }
+          if (!inputStack || inputStack.quantity === 0) { return; }
           let outputStack = craftingStation.output.find(stack => stack.type === recipe.output);
           if (outputStack) { outputStack.quantity++; }
           else { craftingStation.output.push({type: recipe.output, quantity: 1}); }
@@ -238,6 +238,7 @@ export default class App extends React.Component<{}, AppState> {
       building.cooldown = 0;
     });
     this.setState({ buildings: parsed });
+    this.restart();
   }
 
   clear() {
@@ -249,7 +250,12 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   restart() {
-    this.state.buildings.forEach(building => building.cooldown = 0);
+    this.state.buildings.forEach(building => {
+      building.cooldown = 0;
+      building.input = [];
+      building.output = [];
+    });
+
     return this.setState({
       items: [],
       units: [],
@@ -329,7 +335,7 @@ export default class App extends React.Component<{}, AppState> {
         <div className="buildings">
           {this.state.buildings.map(building => (
             <div className={`building ${building.type} ${(building.cooldown ? 'cooldown' : '')}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
-              <button onClick={() => isCraftingStation(building) && this.setState({craftingModal: building})}>
+              <button onMouseOver={() => isCraftingStation(building) && this.setState({craftingModal: building})}>
                 {React.createElement(building.svg)}
               </button>
               
@@ -385,7 +391,12 @@ export default class App extends React.Component<{}, AppState> {
           <button onClick={this.clear.bind(this)}>Clear</button>
         </div>
 
-        { this.state.craftingModal && <CraftingModal building={this.state.craftingModal} config={BUILDINGS_CONFIG.find(config => config.id === this.state.craftingModal!.type)!}/>}
+        { this.state.craftingModal &&
+          <CraftingModal
+              building={this.state.craftingModal}
+              config={BUILDINGS_CONFIG.find(config => config.id === this.state.craftingModal!.type)!}
+              onClose={() => this.setState({craftingModal: null})}
+        />}
       </div>
     );
   }

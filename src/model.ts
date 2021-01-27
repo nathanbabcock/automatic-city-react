@@ -168,13 +168,16 @@ export class Building {
   connector_w: ConnectorType = null;
   input: ItemStack[] = [];
   output: ItemStack[] = [];
-  selectedRecipe: CraftingRecipe | null = null;
+  selectedRecipe: CraftingRecipe | null;
+  config: BuildingConfig;
 
   constructor(x: number, y: number, type: string){
     this.x = x;
     this.y = y;
     this.type = type;
+    this.config = BUILDINGS_CONFIG.find(config => config.id === type)!;
     this.svg = BUILDINGS_CONFIG.find(config => config.id === type)!.svg;
+    this.selectedRecipe = this.config.craftingRecipes ? this.config.craftingRecipes[0] : null;
   }
 }
 
