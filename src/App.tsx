@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack } from './model';
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
@@ -92,6 +92,29 @@ export default class App extends React.Component<{}, AppState> {
         }
       });
 
+      // Craft
+      this.state.buildings
+      .forEach(craftingStation => {
+        const config = BUILDINGS_CONFIG.find(config => config.id === craftingStation.type);
+        if (!config) { return; }
+        if (!config.craftingRecipes) { return; }
+
+        let crafted = false;
+        config.craftingRecipes.forEach(recipe => {
+          if (crafted) { return; }
+          let inputStack: ItemStack | undefined = craftingStation.input.find(item => item.type === recipe.input);
+          if (!inputStack) { return; }
+          let outputStack = craftingStation.output.find(stack => stack.type === recipe.output);
+          if (outputStack) { outputStack.quantity++; }
+          else { craftingStation.output.push({type: recipe.output, quantity: 1}); }
+          inputStack.quantity--;
+          if (inputStack.quantity <= 0) {
+            craftingStation.input = craftingStation.input.filter(input => input !== inputStack);
+          }
+          crafted = true;
+        });
+      });
+
     this.state.units
       .filter(unit => unit.type === 'pawn')
       .forEach(pawn => {
@@ -157,13 +180,14 @@ export default class App extends React.Component<{}, AppState> {
           if (craftingStation.x < pawn.x) { connector = craftingStation.connector_e; }
 
           if (connector === 'in' && pawn.held_item) {
-            console.log(craftingStation);
-            console.log(craftingStation.input);
-            craftingStation.input.push(pawn.held_item);
+            let existingStack = craftingStation.input.find(stack => stack.type === pawn.held_item!.type);
+            if (existingStack) { existingStack.quantity++; }
+            else { craftingStation.input.push({type: pawn.held_item!.type, quantity: 1}); }
             pawn.held_item = null;
             interacted = true;
           } else if (connector === 'out' && craftingStation.output.length > 0 && !pawn.held_item) {
-            pawn.held_item = craftingStation.output.pop() as Item;
+            let outputItem = craftingStation.output.pop();
+            pawn.held_item = new Item(pawn.x, pawn.y, outputItem!.type);
             interacted = true;
           }
         });
@@ -190,24 +214,6 @@ export default class App extends React.Component<{}, AppState> {
           this.setState({units: [...this.state.units]});
         }
       });
-
-    // Craft
-    this.state.buildings
-    .forEach(craftingStation => {
-      const config = BUILDINGS_CONFIG.find(config => config.id === craftingStation.type);
-      if (!config) { return; }
-      if (!config.craftingRecipes) { return; }
-
-      let crafted = false;
-      config.craftingRecipes.forEach(recipe => {
-        if (crafted) { return; }
-        let inputItem = craftingStation.input.find(item => item.type === recipe.input);
-        if (!inputItem) { return; }
-        craftingStation.output.push(new Item(craftingStation.x, craftingStation.y, recipe.output));
-        craftingStation.input = craftingStation.input.filter(input => input !== inputItem);
-        crafted = true;
-      });
-    });
 
     // Dirty force refresh
     this.setState({
@@ -379,7 +385,7 @@ export default class App extends React.Component<{}, AppState> {
           <button onClick={this.clear.bind(this)}>Clear</button>
         </div>
 
-        { this.state.craftingModal && <CraftingModal building={this.state.craftingModal}/>}
+        { this.state.craftingModal && <CraftingModal building={this.state.craftingModal} config={BUILDINGS_CONFIG.find(config => config.id === this.state.craftingModal!.type)!}/>}
       </div>
     );
   }

@@ -166,8 +166,8 @@ export class Building {
   connector_s: ConnectorType = null;
   connector_e: ConnectorType = null;
   connector_w: ConnectorType = null;
-  input: Item[] = [];
-  output: Item[] = [];
+  input: ItemStack[] = [];
+  output: ItemStack[] = [];
   selectedRecipe: CraftingRecipe | null = null;
 
   constructor(x: number, y: number, type: string){
@@ -286,6 +286,10 @@ export type ItemStack = {
   type: string,
   quantity: number,
   config?: ItemConfig,
+}
+
+export function getItemConfig(type: string): ItemConfig {
+  return ITEMS_CONFIG.find(config => config.id === type)!;
 }
 
 export class Item {
