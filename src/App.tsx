@@ -6,6 +6,7 @@ import './App.scss';
 import { CraftingModal } from './components/crafting-modal/crafting-modal';
 
 const randInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1) + min);
+const chooseRandom = (array: any[]): any => array[randInt(0, array.length - 1)];
 
 const toGrid = ({x, y}: {x: number, y: number}) => ({
   x: Math.ceil(x / GRID_SIZE) - 1,
@@ -95,7 +96,7 @@ export default class App extends React.Component<{}, AppState> {
         if (house.cooldown <= 0 && !this.state.units.find(unit => unit.x === house.x && unit.y === house.y)) {
           const spawn_squares = this.getUnitSpawnSquares(house.x, house.y);
           if (spawn_squares.length === 0) { return; }
-          const destination = spawn_squares[0];
+          const destination = chooseRandom(spawn_squares);
           this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn')]});
           house.cooldown = MAX_FOOD;
         }
@@ -193,7 +194,7 @@ export default class App extends React.Component<{}, AppState> {
             } else if (resource.type === 'tree') {
               if (!pawn.held_item || pawn.held_item.type !== 'axe') { return; }
               this.setState({
-                items: [...this.state.items, new Item(pawn.x, pawn.y, 'logs')],
+                items: [...this.state.items, new Item(pawn.x, pawn.y, 'wood')],
               });
             }
             resource.cooldown = 10;
@@ -301,7 +302,7 @@ export default class App extends React.Component<{}, AppState> {
 
   getUnitSpawnSquares(x: number, y: number): {x: number, y: number}[] {
     const n = {x, y: y - 1};
-    const s = {x, y: y - 1};
+    const s = {x, y: y + 1};
     const e = {x: x + 1, y};
     const w = {x: x - 1, y};
     const spawn_n = this.state.buildings.find(building => building.type === 'road_n' && building.x === n.x && building.y === n.y);

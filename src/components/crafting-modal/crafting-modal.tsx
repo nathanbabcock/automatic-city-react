@@ -48,10 +48,10 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
       </div>
 
       <div className={`crafting-output ${this.state.outputSelectorOpen && 'selector-open'}`}>
-        {this.props.building.selectedRecipe!.output.map(recipeStack => {
+        {!this.state.outputSelectorOpen && this.props.building.selectedRecipe!.output.map(recipeStack => {
           const outputStack = this.props.building.output.find(output => output.type === recipeStack.type);
           const isEmpty = !outputStack || outputStack.quantity === 0;
-          return <button className={`output-slot ${isEmpty && 'empty'}`} onClick={() => this.setState({outputSelectorOpen: true})}>
+          return <button className={`output-slot ${isEmpty && 'empty'}`} onClick={() => this.props.config.craftingRecipes!.length > 1 && this.setState({outputSelectorOpen: true})}>
             {React.createElement(getItemConfig(recipeStack.type).svg)}
             <span className="item-quantity">{isEmpty ? 0 : outputStack!.quantity}</span>
           </button>

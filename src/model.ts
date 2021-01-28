@@ -9,7 +9,7 @@ import { ReactComponent as Cave } from './svg/cave.svg';
 import { ReactComponent as Rock } from './svg/rock.svg';
 import { ReactComponent as Tree } from './svg/tree.svg';
 import { ReactComponent as Wall } from './svg/wall.svg';
-import { ReactComponent as Logs } from './svg/logs.svg';
+import { ReactComponent as Wood } from './svg/wood.svg';
 import { ReactComponent as Ore } from './svg/ore.svg';
 import { ReactComponent as Ingot } from './svg/ingot.svg';
 import { ReactComponent as Axe } from './svg/axe.svg';
@@ -25,7 +25,6 @@ import { ReactComponent as Crops } from './svg/crops.svg';
 import { ReactComponent as Sprout } from './svg/sprout.svg';
 import { ReactComponent as Seeds } from './svg/seeds.svg';
 import { ReactComponent as Fish } from './svg/fish.svg';
-import { ReactComponent as Stump } from './svg/stump.svg';
 import { ReactComponent as Bush } from './svg/bush.svg';
 import { ReactComponent as StoneworkTable } from './svg/stonework-table.svg';
 import { ReactComponent as StonePile } from './svg/stone-pile.svg';
@@ -52,8 +51,8 @@ export type ItemConfig = {
 
 export const ITEMS_CONFIG: ItemConfig[] = [
   {
-    id: 'logs',
-    svg: Logs,
+    id: 'wood',
+    svg: Wood,
   },
   {
     id: 'ore',
@@ -192,7 +191,7 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     craftingRecipes: [
       {
         input: [
-          { type: 'stone', quantity: 1 },
+          { type: 'ore', quantity: 1 },
           { type: 'wood', quantity: 1 },
         ],
         output: [{ type: 'ingot', quantity: 1 }],

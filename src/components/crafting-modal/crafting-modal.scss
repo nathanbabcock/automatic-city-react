@@ -71,11 +71,15 @@
   }
 }
 
+.crafting-input,
+.crafting-output {
+  display: flex;
+}
+
 .crafting-output {
   border: 4px solid;
   border-color: inherit;
   margin-bottom: 8px;
-  display: flex;
   
   .output-slot {
     margin: 0;
