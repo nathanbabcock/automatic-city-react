@@ -59,7 +59,16 @@ export default class App extends React.Component<{}, AppState> {
     const ghost = this.state.ghostBuilding;
     if (!ghost) { return; }
     
-    if (!this.state.buildings.find(building => building.x === ghost.x && building.y === ghost.y)) {
+    const buildingAlreadyThere = this.state.buildings.find(building => building.x === ghost.x && building.y === ghost.y);
+
+    if (ghost.type === 'DELETE') {
+      if (buildingAlreadyThere) {
+        this.setState({ buildings: this.state.buildings.filter(building => building !== buildingAlreadyThere) });
+      }
+      return;
+    }
+
+    if (!buildingAlreadyThere) {
       this.setState({ buildings: [...this.state.buildings, ghost] });
     }
   }

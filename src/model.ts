@@ -37,6 +37,7 @@ import { ReactComponent as StoneworkIcon } from './svg/stonework-icon.svg';
 import { ReactComponent as ChestIcon } from './svg/chest-icon.svg';
 import { ReactComponent as AnvilIcon } from './svg/anvil-icon.svg';
 import { ReactComponent as FurnaceIcon } from './svg/furnace-icon.svg';
+import { ReactComponent as X } from './svg/x.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
@@ -247,10 +248,10 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     id: 'sprout',
     svg: Sprout,
   },
-  {
-    id: 'stump',
-    svg: Stump,
-  },
+  // {
+  //   id: 'stump',
+  //   svg: Stump,
+  // },
   {
     id: 'bush',
     svg: Bush,
@@ -258,6 +259,10 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   {
     id: 'stone-pile',
     svg: StonePile,
+  },
+  {
+    id: 'DELETE',
+    svg: X,
   },
 ];
 
