@@ -153,15 +153,23 @@ export default class App extends React.Component<{}, AppState> {
               this.setState({
                 units: [...this.state.units],
               });
-            } else {
-              if (pawn.held_item) { return; }
-              const itemSpawn = {x: pawn.x, y: pawn.y};
-              const itemType = resource.type === 'tree' ? 'logs' : (resource.type === 'stone-pile' ? 'stone' : 'ore');
-              resource.cooldown = 10;
+            } else if (resource.type === 'rock') {
+              if (!pawn.held_item || pawn.held_item.type !== 'pick') { return; }
               this.setState({
-                items: [...this.state.items, new Item(itemSpawn.x, itemSpawn.y, itemType)],
+                items: [...this.state.items, new Item(pawn.x, pawn.y, 'ore')],
+              });
+            } else if (resource.type === 'stone-pile') {
+              if (pawn.held_item) { return; }
+              this.setState({
+                items: [...this.state.items, new Item(pawn.x, pawn.y, 'stone')],
+              });
+            } else if (resource.type === 'tree') {
+              if (!pawn.held_item || pawn.held_item.type !== 'axe') { return; }
+              this.setState({
+                items: [...this.state.items, new Item(pawn.x, pawn.y, 'logs')],
               });
             }
+            resource.cooldown = 10;
             interacted = true;
           }
         });
@@ -238,7 +246,6 @@ export default class App extends React.Component<{}, AppState> {
       building.cooldown = 0;
     });
     this.setState({ buildings: parsed });
-    this.restart();
   }
 
   clear() {
