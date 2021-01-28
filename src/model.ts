@@ -35,11 +35,106 @@ import { ReactComponent as Chest } from './svg/chest.svg';
 import { ReactComponent as Mine } from './svg/mine.svg';
 import { ReactComponent as Furnace } from './svg/furnace.svg';
 import { ReactComponent as StoneworkIcon } from './svg/stonework-icon.svg';
+import { ReactComponent as ChestIcon } from './svg/chest-icon.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
 export const TICK_RATE = 1; // per second
 export const MAX_FOOD = 20;
+
+
+/* Items */
+export type ItemConfig = {
+  id: string,
+  svg: React.FunctionComponent,
+}
+
+export const ITEMS_CONFIG: ItemConfig[] = [
+  {
+    id: 'logs',
+    svg: Logs,
+  },
+  {
+    id: 'ore',
+    svg: Ore,
+  },
+  {
+    id: 'ingot',
+    svg: Ingot,
+  },
+  {
+    id: 'axe',
+    svg: Axe,
+  },
+  {
+    id: 'pick',
+    svg: Pick,
+  },
+  {
+    id: 'sword',
+    svg: Sword,
+  },
+  {
+    id: 'shield',
+    svg: Shield,
+  },
+  {
+    id: 'hoe',
+    svg: Hoe,
+  },
+  {
+    id: 'scythe',
+    svg: Scythe,
+  },
+  {
+    id: 'bucket',
+    svg: Bucket,
+  },
+  {
+    id: 'fishing-rod',
+    svg: FishingRod,
+  },
+  {
+    id: 'wheat',
+    svg: Wheat,
+  },
+  {
+    id: 'seeds',
+    svg: Seeds,
+  },
+  {
+    id: 'fish',
+    svg: Fish,
+  },
+  {
+    id: 'stone',
+    svg: Stone,
+  },
+];
+
+export type ItemStack = {
+  type: string,
+  quantity: number,
+  config?: ItemConfig,
+}
+
+export function getItemConfig(type: string): ItemConfig {
+  return ITEMS_CONFIG.find(config => config.id === type)!;
+}
+
+export class Item {
+  x: number;
+  y: number;
+  type: string;
+  svg: React.FunctionComponent;
+
+  constructor(x: number, y: number, type: string){
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.svg = ITEMS_CONFIG.find(config => config.id === type)!.svg;
+  }
+}
 
 /* Buildings */
 export type CraftingRecipe = {
@@ -98,7 +193,12 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   },
   {
     id: 'chest',
+    icon: ChestIcon,
     svg: Chest,
+    craftingRecipes: ITEMS_CONFIG.map(itemConfig => ({
+      input: itemConfig.id,
+      output: itemConfig.id,
+    })),
   },
   {
     id: 'road_n',
@@ -213,98 +313,5 @@ export class Unit {
     this.food = 20;
     this.held_item = null;
     this.svg = UNITS_CONFIG.find(config => config.id === type)!.svg;
-  }
-}
-
-/* Items */
-export type ItemConfig = {
-  id: string,
-  svg: React.FunctionComponent,
-}
-
-export const ITEMS_CONFIG: ItemConfig[] = [
-  {
-    id: 'logs',
-    svg: Logs,
-  },
-  {
-    id: 'ore',
-    svg: Ore,
-  },
-  {
-    id: 'ingot',
-    svg: Ingot,
-  },
-  {
-    id: 'axe',
-    svg: Axe,
-  },
-  {
-    id: 'pick',
-    svg: Pick,
-  },
-  {
-    id: 'sword',
-    svg: Sword,
-  },
-  {
-    id: 'shield',
-    svg: Shield,
-  },
-  {
-    id: 'hoe',
-    svg: Hoe,
-  },
-  {
-    id: 'scythe',
-    svg: Scythe,
-  },
-  {
-    id: 'bucket',
-    svg: Bucket,
-  },
-  {
-    id: 'fishing-rod',
-    svg: FishingRod,
-  },
-  {
-    id: 'wheat',
-    svg: Wheat,
-  },
-  {
-    id: 'seeds',
-    svg: Seeds,
-  },
-  {
-    id: 'fish',
-    svg: Fish,
-  },
-  {
-    id: 'stone',
-    svg: Stone,
-  },
-];
-
-export type ItemStack = {
-  type: string,
-  quantity: number,
-  config?: ItemConfig,
-}
-
-export function getItemConfig(type: string): ItemConfig {
-  return ITEMS_CONFIG.find(config => config.id === type)!;
-}
-
-export class Item {
-  x: number;
-  y: number;
-  type: string;
-  svg: React.FunctionComponent;
-
-  constructor(x: number, y: number, type: string){
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    this.svg = ITEMS_CONFIG.find(config => config.id === type)!.svg;
   }
 }

@@ -22,6 +22,11 @@
     border-color: $stonework-primary;
     background-color: $stonework-secondary;
   }
+
+  &.chest {
+    border-color: $chest-primary;
+    background-color: $chest-secondary;
+  }
 }
 
 .input-slot,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe, ITEMS_CONFIG } from './model';
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
@@ -180,6 +180,8 @@ export default class App extends React.Component<{}, AppState> {
           if (interacted) { return; }
           const craftingStation = this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && crafting.includes(building.type));
           if (!craftingStation) { return; }
+          const selectedRecipe = craftingStation.selectedRecipe;
+          if (!selectedRecipe) { return; }
 
           let connector;
           if (craftingStation.y > pawn.y) { connector = craftingStation.connector_n; }
@@ -187,7 +189,7 @@ export default class App extends React.Component<{}, AppState> {
           if (craftingStation.x > pawn.x) { connector = craftingStation.connector_w; }
           if (craftingStation.x < pawn.x) { connector = craftingStation.connector_e; }
 
-          if (connector === 'in' && pawn.held_item) {
+          if (connector === 'in' && pawn.held_item && pawn.held_item.type === selectedRecipe.input) {
             let existingStack = craftingStation.input.find(stack => stack.type === pawn.held_item!.type);
             if (existingStack) { existingStack.quantity++; }
             else { craftingStation.input.push({type: pawn.held_item!.type, quantity: 1}); }
