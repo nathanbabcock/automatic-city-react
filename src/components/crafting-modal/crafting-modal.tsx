@@ -33,15 +33,14 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
         onMouseLeave={() => this.props.onClose && this.props.onClose()}
     >
       <div className="crafting-input">
-        {Array.from(Array(this.props.config.inputSlots)).map((_, index) => {
-          const isEmpty = this.props.building.input.length <= index || this.props.building.input[index].quantity === 0;
+        {this.props.building.selectedRecipe!.input.map(recipeStack => {
+          const inputStack = this.props.building.input.find(input => input.type === recipeStack.type);
+          const isEmpty = !inputStack || inputStack.quantity === 0;
           return <div className={`input-slot ${isEmpty && 'empty'}`}>
-            {this.props.building.selectedRecipe && React.createElement(getItemConfig(this.props.building.selectedRecipe.input).svg)}
-            <span className="item-quantity">
-              {isEmpty ? 0 : this.props.building.input[index].quantity}
-            </span>
-          </div>          
-      })}
+            {React.createElement(getItemConfig(recipeStack.type).svg)}
+            <span className="item-quantity">{isEmpty ? 0 : inputStack!.quantity}</span>
+          </div>
+        })}
       </div>
       
       <div className="crafting-icon">
@@ -49,18 +48,17 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
       </div>
 
       <div className={`crafting-output ${this.state.outputSelectorOpen && 'selector-open'}`}>
-      {!this.state.outputSelectorOpen && Array.from(Array(this.props.config.outputSlots)).map((_, index) => {
-          const isEmpty = this.props.building.output.length <= index || this.props.building.output[index].quantity === 0;
+        {this.props.building.selectedRecipe!.output.map(recipeStack => {
+          const outputStack = this.props.building.output.find(output => output.type === recipeStack.type);
+          const isEmpty = !outputStack || outputStack.quantity === 0;
           return <button className={`output-slot ${isEmpty && 'empty'}`} onClick={() => this.setState({outputSelectorOpen: true})}>
-            {this.props.building.selectedRecipe && React.createElement(getItemConfig(this.props.building.selectedRecipe.output).svg)}
-            <span className="item-quantity">
-              {isEmpty ? 0 : this.props.building.output[index].quantity}
-            </span>
+            {React.createElement(getItemConfig(recipeStack.type).svg)}
+            <span className="item-quantity">{isEmpty ? 0 : outputStack!.quantity}</span>
           </button>
         })}
-        { this.state.outputSelectorOpen && this.props.building.config.craftingRecipes?.map(recipe => {
+        {this.state.outputSelectorOpen && this.props.building.config.craftingRecipes?.map(recipe => {
           return <button className="output-slot selector-option" onClick={() => this.selectRecipe(recipe)}>
-            {React.createElement(getItemConfig(recipe.output).svg)}
+            {React.createElement(getItemConfig(recipe.output[0].type).svg)/* multi-output breaks here */}
           </button>
         })}
       </div>

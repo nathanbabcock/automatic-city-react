@@ -32,16 +32,16 @@ import { ReactComponent as StonePile } from './svg/stone-pile.svg';
 import { ReactComponent as Stone } from './svg/stone.svg';
 import { ReactComponent as Anvil } from './svg/anvil.svg';
 import { ReactComponent as Chest } from './svg/chest.svg';
-import { ReactComponent as Mine } from './svg/mine.svg';
 import { ReactComponent as Furnace } from './svg/furnace.svg';
 import { ReactComponent as StoneworkIcon } from './svg/stonework-icon.svg';
 import { ReactComponent as ChestIcon } from './svg/chest-icon.svg';
+import { ReactComponent as AnvilIcon } from './svg/anvil-icon.svg';
+import { ReactComponent as FurnaceIcon } from './svg/furnace-icon.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
 export const TICK_RATE = 1; // per second
 export const MAX_FOOD = 20;
-
 
 /* Items */
 export type ItemConfig = {
@@ -112,12 +112,6 @@ export const ITEMS_CONFIG: ItemConfig[] = [
   },
 ];
 
-export type ItemStack = {
-  type: string,
-  quantity: number,
-  config?: ItemConfig,
-}
-
 export function getItemConfig(type: string): ItemConfig {
   return ITEMS_CONFIG.find(config => config.id === type)!;
 }
@@ -136,12 +130,16 @@ export class Item {
   }
 }
 
+export type ItemStack = {
+  type: string,
+  quantity: number,
+  config?: ItemConfig,
+}
+
 /* Buildings */
 export type CraftingRecipe = {
-  input: string,
-  output: string,
-  input_quantity?: number,
-  output_quantity?: number,
+  input: ItemStack[],
+  output: ItemStack[],
 }
 
 export type BuildingConfig = {
@@ -164,16 +162,12 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     svg: StoneworkTable,
     craftingRecipes: [
       {
-        input: 'stone',
-        output: 'axe',
+        input: [{type: 'stone', quantity: 1}],
+        output: [{type: 'axe', quantity: 1}],
       },
       {
-        input: 'stone',
-        output: 'pick',
-      },
-      {
-        input: 'stone',
-        output: 'sword',
+        input: [{type: 'stone', quantity: 1}],
+        output: [{type: 'pick', quantity: 1}],
       },
     ],
     inputSlots: 1,
@@ -181,23 +175,36 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
   },
   {
     id: 'anvil',
+    icon: AnvilIcon,
     svg: Anvil,
+    craftingRecipes: [
+      {
+        input: [{ type: 'ingot', quantity: 3 }],
+        output: [{ type: 'sword', quantity: 1 }],
+      }
+    ],
   },
-  // {
-  //   id: 'mine',
-  //   svg: Mine,
-  // },
   {
     id: 'furnace',
     svg: Furnace,
+    icon: FurnaceIcon,
+    craftingRecipes: [
+      {
+        input: [
+          { type: 'stone', quantity: 1 },
+          { type: 'wood', quantity: 1 },
+        ],
+        output: [{ type: 'ingot', quantity: 1 }],
+      }
+    ],
   },
   {
     id: 'chest',
     icon: ChestIcon,
     svg: Chest,
     craftingRecipes: ITEMS_CONFIG.map(itemConfig => ({
-      input: itemConfig.id,
-      output: itemConfig.id,
+      input: [{type: itemConfig.id, quantity: 1}],
+      output: [{ type: itemConfig.id, quantity: 1}],
     })),
   },
   {

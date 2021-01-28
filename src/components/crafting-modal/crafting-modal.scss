@@ -27,6 +27,16 @@
     border-color: $chest-primary;
     background-color: $chest-secondary;
   }
+
+  &.furnace {
+    border-color: $furnace-primary;
+    background-color: $furnace-secondary;
+  }
+
+  &.anvil {
+    border-color: $anvil-primary;
+    background-color: $anvil-secondary;
+  }
 }
 
 .input-slot,

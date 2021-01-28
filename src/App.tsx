@@ -92,26 +92,44 @@ export default class App extends React.Component<{}, AppState> {
         }
       });
 
-      // Craft
+      // Craft 
       this.state.buildings
       .forEach(craftingStation => {
+        // Sanity checks
         const config = BUILDINGS_CONFIG.find(config => config.id === craftingStation.type);
         if (!config) { return; }
         if (!config.craftingRecipes) { return; }
+        const recipe = craftingStation.selectedRecipe;
+        if (!recipe) { return; }
 
-        let crafted = false;
-        [craftingStation.selectedRecipe!].forEach(recipe => {
-          if (crafted) { return; }
-          let inputStack: ItemStack | undefined = craftingStation.input.find(item => item.type === recipe.input);
-          if (!inputStack || inputStack.quantity === 0) { return; }
-          let outputStack = craftingStation.output.find(stack => stack.type === recipe.output);
-          if (outputStack) { outputStack.quantity++; }
-          else { craftingStation.output.push({type: recipe.output, quantity: 1}); }
-          inputStack.quantity--;
+        // Check that we have all ingredients
+        let validInput = true;
+        recipe.input.forEach(recipeStack => {
+          if (!validInput) return;
+          if (!craftingStation.input.find(itemStack => itemStack.type === recipeStack.type && itemStack.quantity >= recipeStack.quantity)) {
+            validInput = false;
+            return;
+          }
+        });
+        if (!validInput) return;
+
+        // Now subtract the input...
+        recipe.input.forEach(recipeStack => {
+          const inputStack = craftingStation.input.find(itemStack => itemStack.type === recipeStack.type)!;
+          inputStack.quantity -= recipeStack.quantity;
           if (inputStack.quantity <= 0) {
             craftingStation.input = craftingStation.input.filter(input => input !== inputStack);
           }
-          crafted = true;
+        });
+
+        // ...And add the output
+        recipe.output.forEach(recipeStack => {
+          const outputStack = craftingStation.output.find(itemStack => itemStack.type === recipeStack.type)!;
+          if (outputStack) {
+            outputStack.quantity += recipeStack.quantity;
+          } else {
+            craftingStation.output.push({type: recipeStack.type, quantity: recipeStack.quantity});
+          }
         });
       });
 
@@ -189,7 +207,7 @@ export default class App extends React.Component<{}, AppState> {
           if (craftingStation.x > pawn.x) { connector = craftingStation.connector_w; }
           if (craftingStation.x < pawn.x) { connector = craftingStation.connector_e; }
 
-          if (connector === 'in' && pawn.held_item && pawn.held_item.type === selectedRecipe.input) {
+          if (connector === 'in' && pawn.held_item && selectedRecipe.input.find(recipeStack => recipeStack.type === pawn.held_item!.type)) {
             let existingStack = craftingStation.input.find(stack => stack.type === pawn.held_item!.type);
             if (existingStack) { existingStack.quantity++; }
             else { craftingStation.input.push({type: pawn.held_item!.type, quantity: 1}); }
