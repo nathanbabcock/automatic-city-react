@@ -42,6 +42,7 @@ import { ReactComponent as X } from './svg/x.svg';
 export const GRID_SIZE = 64;
 export const TICK_RATE = 1; // per second
 export const MAX_FOOD = 20;
+export const MAX_HEALTH = 5;
 
 /* Items */
 export type ItemConfig = {
@@ -314,15 +315,19 @@ export class Unit {
   y: number;
   type: string;
   food: number;
+  health: number;
   svg: React.FunctionComponent;
   held_item: Item | null;
+  spawn: Building | null;
 
-  constructor(x: number, y: number, type: string){
+  constructor(x: number, y: number, type: string, spawn: Building | null = null){
     this.x = x;
     this.y = y;
     this.type = type;
-    this.food = 20;
+    this.food = MAX_FOOD;
+    this.health = MAX_HEALTH;
     this.held_item = null;
     this.svg = UNITS_CONFIG.find(config => config.id === type)!.svg;
+    this.spawn = spawn;
   }
 }

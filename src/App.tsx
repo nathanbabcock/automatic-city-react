@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe, ITEMS_CONFIG } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe, ITEMS_CONFIG, MAX_HEALTH } from './model';
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
 import './App.scss';
@@ -97,8 +97,21 @@ export default class App extends React.Component<{}, AppState> {
           const spawn_squares = this.getUnitSpawnSquares(house.x, house.y);
           if (spawn_squares.length === 0) { return; }
           const destination = chooseRandom(spawn_squares);
-          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn')]});
+          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn', house)]});
           house.cooldown = MAX_FOOD;
+        }
+      });
+
+    // Spawn enemies
+    this.state.buildings
+      .filter(building => building.type === 'cave')
+      .forEach(cave => {
+        if (cave.cooldown <= 0 && !this.state.units.find(unit => unit.x === cave.x && unit.y === cave.y)) {
+          const spawn_squares = this.getEnemySpawnSquares(cave.x, cave.y);
+          if (spawn_squares.length === 0) { return; }
+          const destination = chooseRandom(spawn_squares);
+          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'orc', cave)]});
+          cave.cooldown = MAX_FOOD;
         }
       });
 
@@ -253,6 +266,37 @@ export default class App extends React.Component<{}, AppState> {
         }
       });
 
+    this.state.units
+      .filter(unit => unit.type === 'orc')
+      .forEach(orc => {
+        const adjacent = getAdjacent(orc.x, orc.y);
+        if (!orc.spawn) return;
+
+        let attacked = false;
+        adjacent.forEach(tile => {
+          if (attacked) return;
+          const pawn = this.state.units.find(unit => unit.type === 'pawn' && unit.x === tile.x && unit.y === tile.y);
+          if (!pawn) return;
+          attacked = true;
+          pawn.health--;
+          if (pawn.health <= 0) {
+            this.setState({
+              units: this.state.units.filter(unit => unit !== pawn)
+            });
+          }
+        });
+        if (attacked) return;
+
+        // random walk
+        const walkTo = chooseRandom(adjacent
+          .filter(tile => !this.state.buildings.find(building => building.x === tile.x && building.y === tile.y && !building.type.startsWith('road')))
+          .filter(tile => !this.state.units.find(unit => unit.x === tile.x && unit.y === tile.y))
+          .filter(tile => orc.spawn && Math.abs(tile.x - orc.spawn.x) <= 2 && Math.abs(tile.y - orc.spawn.y) <= 2));
+
+        orc.x = walkTo.x;
+        orc.y = walkTo.y;
+      });
+
     // Dirty force refresh
     this.setState({
       items: [...this.state.items],
@@ -315,6 +359,19 @@ export default class App extends React.Component<{}, AppState> {
       spawn_e,
       spawn_w,
     ].filter(spawn => spawn !== undefined && !this.state.units.find(unit => unit.x === spawn.x && unit.y === spawn.y)) as {x: number, y: number}[];
+  }
+
+  getEnemySpawnSquares(x: number, y: number): {x: number, y: number}[] {
+    const n = {x, y: y - 1};
+    const s = {x, y: y + 1};
+    const e = {x: x + 1, y};
+    const w = {x: x - 1, y};
+    return [n, s, e, w]
+      .filter(spawn => {
+        const hasBuilding = this.state.units.find(unit => unit.x === spawn.x && unit.y === spawn.y);
+        const hasUnit = this.state.buildings.find(building => building.x === spawn.x && building.y === spawn.y);
+        return !hasBuilding && !hasUnit;
+      });
   }
 
   componentDidMount() {
@@ -414,6 +471,9 @@ export default class App extends React.Component<{}, AppState> {
             <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
               {React.createElement(unit.svg)}
               {unit.held_item && (<div className="held-item">{React.createElement(unit.held_item.svg)}</div>)}
+              <div className="health-bar">
+                <div className="health-bar-fill" style={{width: `${Math.round((unit.health / MAX_HEALTH) * 100)}%`}}></div>
+              </div>
               <div className="food-bar">
                 <div className="food-bar-fill" style={{height: `${Math.round((unit.food / MAX_FOOD) * 100)}%`}}></div>
               </div>
