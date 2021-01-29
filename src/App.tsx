@@ -215,6 +215,21 @@ export default class App extends React.Component<{}, AppState> {
           }
         });
 
+        // Attack
+        const enemies = ['orc'];
+        adjacent.forEach(tile => {
+          if (interacted) return;
+          const enemy = this.state.units.find(unit => enemies.includes(unit.type) && unit.x === tile.x && unit.y === tile.y);
+          if (!enemy) return;
+          if (!pawn.held_item || pawn.held_item.type !== 'sword') return;
+          enemy.health--;
+          if (enemy.health <= 0) {
+            this.setState({
+              units: this.state.units.filter(unit => unit !== enemy)
+            });
+          }
+        })
+
         // Load/unload crafting
         const crafting = ['stonework-table', 'furnace', 'anvil', 'chest'];
         adjacent.forEach(tile => {
