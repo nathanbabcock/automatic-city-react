@@ -44,6 +44,15 @@ export const TICK_RATE = 1; // per second
 export const MAX_FOOD = 20;
 export const MAX_HEALTH = 5;
 
+/* Util */
+export function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    // eslint-disable-next-line no-mixed-operators
+    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 /* Items */
 export type ItemConfig = {
   id: string,
@@ -118,12 +127,14 @@ export function getItemConfig(type: string): ItemConfig {
 }
 
 export class Item {
+  id: string;
   x: number;
   y: number;
   type: string;
   svg: React.FunctionComponent;
 
   constructor(x: number, y: number, type: string){
+    this.id = uuid();
     this.x = x;
     this.y = y;
     this.type = type;
@@ -180,7 +191,7 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     svg: Anvil,
     craftingRecipes: [
       {
-        input: [{ type: 'ingot', quantity: 3 }],
+        input: [{ type: 'ingot', quantity: 1 }],
         output: [{ type: 'sword', quantity: 1 }],
       }
     ],
@@ -248,10 +259,6 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
     id: 'sprout',
     svg: Sprout,
   },
-  // {
-  //   id: 'stump',
-  //   svg: Stump,
-  // },
   {
     id: 'bush',
     svg: Bush,
@@ -269,6 +276,7 @@ export const BUILDINGS_CONFIG: BuildingConfig[] = [
 export type ConnectorType = 'in' | 'out' | null;
 
 export class Building {
+  id: string;
   x: number;
   y: number;
   type: string;
@@ -284,6 +292,7 @@ export class Building {
   config: BuildingConfig;
 
   constructor(x: number, y: number, type: string){
+    this.id = uuid();
     this.x = x;
     this.y = y;
     this.type = type;
@@ -311,6 +320,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
 ];
 
 export class Unit {
+  id: string;
   x: number;
   y: number;
   type: string;
@@ -321,6 +331,7 @@ export class Unit {
   spawn: {x: number, y: number} | null;
 
   constructor(x: number, y: number, type: string, spawn: {x: number, y: number} | null = null){
+    this.id = uuid();
     this.x = x;
     this.y = y;
     this.type = type;

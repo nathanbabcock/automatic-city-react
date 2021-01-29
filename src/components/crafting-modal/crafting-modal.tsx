@@ -22,7 +22,6 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
       if (existingStack) { existingStack.quantity++; }
       else { counted.push({type: item.type, quantity: 1, config: ITEMS_CONFIG.find(config => config.id === item.type)}); }
     });
-    console.log('count');
     return  counted;
   }
 
@@ -36,7 +35,7 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
         {this.props.building.selectedRecipe!.input.map(recipeStack => {
           const inputStack = this.props.building.input.find(input => input.type === recipeStack.type);
           const isEmpty = !inputStack || inputStack.quantity === 0;
-          return <div className={`input-slot ${isEmpty && 'empty'}`}>
+          return <div className={`input-slot ${isEmpty && 'empty'}`} key={recipeStack.type}>
             {React.createElement(getItemConfig(recipeStack.type).svg)}
             <span className="item-quantity">{isEmpty ? 0 : inputStack!.quantity}</span>
           </div>
@@ -51,13 +50,13 @@ export class CraftingModal extends React.Component<CraftingModalProps, CraftingM
         {!this.state.outputSelectorOpen && this.props.building.selectedRecipe!.output.map(recipeStack => {
           const outputStack = this.props.building.output.find(output => output.type === recipeStack.type);
           const isEmpty = !outputStack || outputStack.quantity === 0;
-          return <button className={`output-slot ${isEmpty && 'empty'}`} onClick={() => this.props.config.craftingRecipes!.length > 1 && this.setState({outputSelectorOpen: true})}>
+          return <button className={`output-slot ${isEmpty && 'empty'}`} key={recipeStack.type} onClick={() => this.props.config.craftingRecipes!.length > 1 && this.setState({outputSelectorOpen: true})}>
             {React.createElement(getItemConfig(recipeStack.type).svg)}
             <span className="item-quantity">{isEmpty ? 0 : outputStack!.quantity}</span>
           </button>
         })}
         {this.state.outputSelectorOpen && this.props.building.config.craftingRecipes?.map(recipe => {
-          return <button className="output-slot selector-option" onClick={() => this.selectRecipe(recipe)}>
+          return <button className="output-slot selector-option" key={recipe.output[0].type} onClick={() => this.selectRecipe(recipe)}>
             {React.createElement(getItemConfig(recipe.output[0].type).svg)/* multi-output breaks here */}
           </button>
         })}

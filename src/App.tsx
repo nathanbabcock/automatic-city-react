@@ -1,9 +1,9 @@
 import React from 'react';
-import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, ItemStack, CraftingRecipe, ITEMS_CONFIG, MAX_HEALTH } from './model';
+import { GRID_SIZE, Building, BUILDINGS_CONFIG, Unit, TICK_RATE, Item, MAX_FOOD, ConnectorType, CraftingRecipe, MAX_HEALTH } from './model';
 import { ReactComponent as Connector } from './svg/connector.svg';
 import { ReactComponent as ConnectorArrow } from './svg/connector-arrow.svg';
-import './App.scss';
 import { CraftingModal } from './components/crafting-modal/crafting-modal';
+import './App.scss';
 
 const randInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1) + min);
 const chooseRandom = (array: any[]): any => array[randInt(0, array.length - 1)];
@@ -70,7 +70,10 @@ export default class App extends React.Component<{}, AppState> {
     }
 
     if (!buildingAlreadyThere) {
-      this.setState({ buildings: [...this.state.buildings, ghost] });
+      this.setState({
+        buildings: [...this.state.buildings, ghost],
+        ghostBuilding: new Building(ghost.x, ghost.y, ghost.type),
+       });
     }
   }
 
@@ -228,6 +231,7 @@ export default class App extends React.Component<{}, AppState> {
               units: this.state.units.filter(unit => unit !== enemy)
             });
           }
+          interacted = true;
         })
 
         // Load/unload crafting
@@ -308,6 +312,8 @@ export default class App extends React.Component<{}, AppState> {
           .filter(tile => !this.state.units.find(unit => unit.x === tile.x && unit.y === tile.y))
           .filter(tile => orc.spawn && Math.abs(tile.x - orc.spawn.x) <= 2 && Math.abs(tile.y - orc.spawn.y) <= 2));
 
+        if(!walkTo) { return; }
+
         orc.x = walkTo.x;
         orc.y = walkTo.y;
       });
@@ -384,7 +390,7 @@ export default class App extends React.Component<{}, AppState> {
     return [n, s, e, w]
       .filter(spawn => {
         const hasBuilding = this.state.units.find(unit => unit.x === spawn.x && unit.y === spawn.y);
-        const hasUnit = this.state.buildings.find(building => building.x === spawn.x && building.y === spawn.y);
+        const hasUnit = this.state.buildings.find(building => building.x === spawn.x && building.y === spawn.y && !building.type.startsWith('road'));
         return !hasBuilding && !hasUnit;
       });
   }
@@ -413,8 +419,6 @@ export default class App extends React.Component<{}, AppState> {
     this.currentbuildMode = buildingType;
     const gridCoords = toGrid({ x:event.clientX, y: event.clientY });
     this.setState({ghostBuilding: new Building(gridCoords.x, gridCoords.y, buildingType)});
-    console.log(this.state.ghostBuilding);
-    console.log(!!this.state.ghostBuilding);
     event.stopPropagation();
   }
 
@@ -440,10 +444,10 @@ export default class App extends React.Component<{}, AppState> {
 
   render() {
     return (
-      <div>
+      <div key="app">
         <div className="buildings">
           {this.state.buildings.map(building => (
-            <div className={`building ${building.type} ${(building.cooldown ? 'cooldown' : '')}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
+            <div key={building.id} className={`building ${building.type} ${(building.cooldown ? 'cooldown' : '')}`} style={{ left: building.x * GRID_SIZE, top: building.y * GRID_SIZE }}>
               <button onMouseOver={() => isCraftingStation(building) && this.setState({craftingModal: building})}>
                 {React.createElement(building.svg)}
               </button>
@@ -477,13 +481,13 @@ export default class App extends React.Component<{}, AppState> {
 
         <div className="items">
           {this.state.items.map(item => (
-            <div className="item" style={{ left: item.x * GRID_SIZE, top: item.y * GRID_SIZE }}>{React.createElement(item.svg)}</div>
+            <div className="item" key={item.id} style={{ left: item.x * GRID_SIZE, top: item.y * GRID_SIZE }}>{React.createElement(item.svg)}</div>
           ))}
         </div>
 
         <div className="units">
           {this.state.units.map(unit => (
-            <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
+            <div className="unit" key={unit.id} style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
               {React.createElement(unit.svg)}
               {unit.held_item && (<div className="held-item">{React.createElement(unit.held_item.svg)}</div>)}
               {unit.health < MAX_HEALTH && <div className="health-bar">
@@ -498,7 +502,7 @@ export default class App extends React.Component<{}, AppState> {
 
         <div className="build-ui">
           <strong>Build:</strong>
-          { BUILDINGS_CONFIG.map(building => (<button onClick={(event) => this.setBuildMode(building.id, event)}>{React.createElement(building.svg)}</button>))}
+          { BUILDINGS_CONFIG.map(building => (<button key={building.id} onClick={(event) => this.setBuildMode(building.id, event)}>{React.createElement(building.svg)}</button>))}
           <button onClick={this.restart.bind(this)}>Restart</button>
           <button onClick={this.clear.bind(this)}>Clear</button>
         </div>
