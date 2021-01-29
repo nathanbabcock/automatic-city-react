@@ -97,7 +97,7 @@ export default class App extends React.Component<{}, AppState> {
           const spawn_squares = this.getUnitSpawnSquares(house.x, house.y);
           if (spawn_squares.length === 0) { return; }
           const destination = chooseRandom(spawn_squares);
-          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn', house)]});
+          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'pawn', {x: house.x, y: house.y})]});
           house.cooldown = MAX_FOOD;
         }
       });
@@ -110,7 +110,7 @@ export default class App extends React.Component<{}, AppState> {
           const spawn_squares = this.getEnemySpawnSquares(cave.x, cave.y);
           if (spawn_squares.length === 0) { return; }
           const destination = chooseRandom(spawn_squares);
-          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'orc', cave)]});
+          this.setState({units: [...this.state.units, new Unit(destination.x, destination.y, 'orc', {x: cave.x, y: cave.y})]});
           cave.cooldown = MAX_FOOD;
         }
       });
@@ -486,9 +486,9 @@ export default class App extends React.Component<{}, AppState> {
             <div className="unit" style={{ left: unit.x * GRID_SIZE, top: unit.y * GRID_SIZE }}>
               {React.createElement(unit.svg)}
               {unit.held_item && (<div className="held-item">{React.createElement(unit.held_item.svg)}</div>)}
-              <div className="health-bar">
+              {unit.health < MAX_HEALTH && <div className="health-bar">
                 <div className="health-bar-fill" style={{width: `${Math.round((unit.health / MAX_HEALTH) * 100)}%`}}></div>
-              </div>
+              </div>}
               <div className="food-bar">
                 <div className="food-bar-fill" style={{height: `${Math.round((unit.food / MAX_FOOD) * 100)}%`}}></div>
               </div>

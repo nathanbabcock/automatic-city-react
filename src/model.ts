@@ -318,9 +318,9 @@ export class Unit {
   health: number;
   svg: React.FunctionComponent;
   held_item: Item | null;
-  spawn: Building | null;
+  spawn: {x: number, y: number} | null;
 
-  constructor(x: number, y: number, type: string, spawn: Building | null = null){
+  constructor(x: number, y: number, type: string, spawn: {x: number, y: number} | null = null){
     this.x = x;
     this.y = y;
     this.type = type;
