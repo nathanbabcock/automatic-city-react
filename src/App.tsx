@@ -227,8 +227,10 @@ export default class App extends React.Component<{}, AppState> {
           if (!pawn.held_item || pawn.held_item.type !== 'sword') return;
           enemy.health--;
           if (enemy.health <= 0) {
+            const drop = new Item(enemy.x, enemy.y, 'gem');
             this.setState({
-              units: this.state.units.filter(unit => unit !== enemy)
+              units: this.state.units.filter(unit => unit !== enemy),
+              items: [...this.state.items, drop],
             });
           }
           interacted = true;
@@ -285,9 +287,19 @@ export default class App extends React.Component<{}, AppState> {
         }
       });
 
+    // Enemies
     this.state.units
       .filter(unit => unit.type === 'orc')
       .forEach(orc => {
+        orc.food -= 1;
+
+        if (orc.food <= 0) {
+          // Starve
+          this.setState({
+            units: [...this.state.units.filter(unit => unit !== orc)],
+          });
+        }
+
         const adjacent = getAdjacent(orc.x, orc.y);
         if (!orc.spawn) return;
 

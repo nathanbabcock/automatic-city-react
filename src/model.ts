@@ -37,6 +37,7 @@ import { ReactComponent as ChestIcon } from './svg/chest-icon.svg';
 import { ReactComponent as AnvilIcon } from './svg/anvil-icon.svg';
 import { ReactComponent as FurnaceIcon } from './svg/furnace-icon.svg';
 import { ReactComponent as X } from './svg/x.svg';
+import { ReactComponent as Gem } from './svg/gem.svg';
 
 /* Config */
 export const GRID_SIZE = 64;
@@ -120,6 +121,10 @@ export const ITEMS_CONFIG: ItemConfig[] = [
     id: 'stone',
     svg: Stone,
   },
+  {
+    id: 'gem',
+    svg: Gem,
+  }
 ];
 
 export function getItemConfig(type: string): ItemConfig {
